@@ -27,13 +27,13 @@ class Executor:
 				gdb.execute("run")
 			else:
 				gdb.execute("file " + s[:split])
-				print s[split + 1:]
+				print(s[split + 1:])
 				gdb.execute("run " + s[split + 1:])
 			pass
-		except gdb.error, ex:
+		except gdb.error as ex:
 			self.result.on_gdb_error(str(ex))
-			print ex
-		except Exception, ex:
+			print(ex)
+		except Exception as ex:
 			self.result.log.append(str(ex))
 		pass
 
@@ -86,8 +86,8 @@ class Executor:
 			pass
 			gdb.events.stop.connect(stop_handler)
 
-		except Exception, ex:
-			print "exception in set_handlers(): " + str(ex)
+		except Exception as ex:
+			print("exception in set_handlers(): " + str(ex))
 		pass
 	pass
 
@@ -102,14 +102,14 @@ def main():
 		# f = open(files.task_temp)
 		# task = f.readline()
 		# f.close()
-		print task
+		print(task)
 
 		executor = Executor()
 		executor.run(task)
 		dump(executor.result, files.result_dump)
 
-	except IOError, ex:
-		print str(ex)
+	except IOError as ex:
+		print(str(ex))
 	pass
 pass
 
