@@ -32,10 +32,10 @@ pass
 
 def dump(obj, filename):
 	try:
-		f = open(filename, 'w')
+		f = open(filename, 'wb')
 		pickle.Pickler(f).dump(obj)
 		f.close()
-	except Exception, ex:
+	except Exception as ex:
 		#print "trouble while dumping: " + str(ex.__class__.__name__) + " " + str(ex)
 		raise
 pass
@@ -43,11 +43,11 @@ pass
 
 def load(filename):
 	try:
-		f = open(filename, 'r')
+		f = open(filename, 'rb')
 		obj = pickle.Unpickler(f).load()
 		f.close()
 		return obj
-	except Exception, ex:
+	except Exception as ex:
 		#print "trouble while loading: " + str(ex.__class__.__name__) + " " + str(ex)
 		raise
 pass
