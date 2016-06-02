@@ -81,46 +81,6 @@ class TaskExecutor:
 		pass
 	pass
 
-	# def exec_and_get_result(self, progname, args):
-	#
-	# 	rm_file(files.result_dump)
-	#
-	# 	try:
-	# 		timeout = self.exec_gdb_timeout(progname, args)
-	#
-	# 	except Exception, ex:
-	# 		print str(ex.__class__.__name__) + " in exec_gdb(): " + str(ex)
-	# 		raise
-	# 	pass
-	#
-	# 	if not timeout:
-	# 		try:
-	# 			result = load(files.result_dump)
-	# 			result.log.append("OUT. deserialized from file")
-	# 		except:
-	# 			try:
-	# 				parser = Parser(self.time_limit, self.memory_limit)
-	# 				result = parser.parse_file(files.stderr)
-	# 			except:
-	# 				result = ExecutionResult()
-	# 				result.log.append("unable to parse stderr")
-	# 			pass
-	# 		pass
-	# 	else:
-	# 		try:
-	# 			parser = Parser(self.time_limit, self.memory_limit)
-	# 			result = parser.parse_file(files.stderr)
-	# 			if result.state != 'memexceed':
-	# 				result.on_timeout(self.time_limit)
-	# 		except:
-	# 			result = ExecutionResult()
-	# 			result.on_timeout(self.time_limit)
-	# 		pass
-	# 	pass
-	#
-	# 	return result
-	# pass
-
 	def res_from_dump(self):
 		try:
 			result = load(files.result_dump)
@@ -192,10 +152,11 @@ class TaskExecutor:
 			# print echoarg
 			# input()
 			pipe = " | "
-			gdbstart = str(realpath) + "/timeout" + " -t " + str(self.time_limit) + " -m " + str(self.memory_limit)\
+			gdbstart = "perl -w " + str(realpath) + "/timeout" + " -t " + str(self.time_limit) + " -m " + str(self.memory_limit)\
 					+ " gdb --silent 2>" + shell_escape(files.stderr) + " 1>/dev/null"
 
 			cmd = "echo " + shell_escape(echoarg) + pipe + gdbstart
+			#print "cmd:", cmd
 			return RunCmdTimeout(cmd, progname, self.time_limit).run()
 		except Exception, ex:
 			print ex
