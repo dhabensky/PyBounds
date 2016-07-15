@@ -4,10 +4,22 @@ import sys
 sys.path.append(path)
 
 from Shared.Files import *
-files = Files(taskfile)
+files = Files(dir_name, taskfile)
 
 from GdbInternal import gdb_utils
 from Shared.ExecutionResult import ExecutionResult
+
+
+def debug_print(s, name_log):
+	directory = "/home/max/TestFile/"
+	directory += name_log
+	format_file = ".txt"
+	directory += format_file
+
+	ffff = open(directory, 'a')
+	ffff.write(s)
+	ffff.write('\n')
+	ffff.close()
 
 
 class Executor:
@@ -20,14 +32,13 @@ class Executor:
 
 	def run(self, s):
 
-		split = s.find(" ")
+		split = s.find("\t")
 		try:
 			if split == -1:
 				gdb.execute("file " + s)
 				gdb.execute("run")
 			else:
 				gdb.execute("file " + s[:split])
-				print(s[split + 1:])
 				gdb.execute("run " + s[split + 1:])
 			pass
 		except gdb.error as ex:
@@ -46,7 +57,7 @@ class Executor:
 			s = gdb_utils.execute_output("info signal " + str(signo))[1]
 			pref = s[:s.find(' ')] + ", "
 			s = s[s.rfind('\t'):]
-			for i in xrange(len(s)):
+			for i in range(len(s)):
 				if not s[i].isspace():
 					s = s[i:]
 					break
@@ -94,10 +105,7 @@ class Executor:
 pass
 
 
-
-
 def main():
-
 	try:
 		# f = open(files.task_temp)
 		# task = f.readline()

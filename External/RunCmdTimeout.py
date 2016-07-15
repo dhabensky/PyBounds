@@ -18,7 +18,6 @@ class RunCmd(threading.Thread):
 	pass
 
 	def run(self):
-		#print self.cmd
 		os.system(self.cmd)
 	pass
 

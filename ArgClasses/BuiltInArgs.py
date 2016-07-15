@@ -10,7 +10,7 @@ class SimpleArg:
 		self.used = False
 	pass
 
-	def next(self):
+	def __next__(self):
 		if not self.used:
 			self.used = True
 			return self.raw_string
@@ -36,7 +36,7 @@ class LetterArg:
 		self.cur_letter = ord('A') - 1
 	pass
 
-	def next(self):
+	def __next__(self):
 		if self.cur_letter < ord('z'):
 			if self.cur_letter == ord('Z'):
 				self.cur_letter = ord('a')
@@ -69,7 +69,7 @@ class ListArg:
 
 	pass
 
-	def next(self):
+	def __next__(self):
 		if self.ind < len(self.list) - 1:
 			self.ind += 1
 			return self.list[self.ind]
@@ -120,7 +120,7 @@ class LongArgFromFile:
 					+ "start=" + str(self.start) + ", end=" + str(self.end) + ", step=" + str(self.step))
 	pass
 
-	def next(self):
+	def __next__(self):
 		if self.has_next():
 			self.current_count += self.step
 			return self.content[:self.current_count]

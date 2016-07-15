@@ -56,7 +56,7 @@ class Import:
 				try:
 					imp.classes.append(getattr(mod, cls))
 				except:
-					print "    - " + mod.__name__ + "." + cls + ": class not found"
+					print("    - " + mod.__name__ + "." + cls + ": class not found")
 
 		return imp
 	pass

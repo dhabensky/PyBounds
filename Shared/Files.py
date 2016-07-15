@@ -7,14 +7,15 @@ from External.Escape import *
 
 class Files(object):
 
-	def __init__(self, task_file):
-		filename = task_file[task_file.rfind('/') + 1:]
+	def __init__(self, dir_temp, task_file):
+		filename = task_file[(task_file.rfind('/')):]
+		self.dir_name = dir_temp
 		self.task = task_file
-		self.task_temp = os.path.expanduser('~/.PyBounds/' + filename + '_current')
-		self.stderr = os.path.expanduser('~/.PyBounds/' + filename + '_stderr')
-		self.result_dump = os.path.expanduser('~/.PyBounds/' + filename + '_resultdump')
+		self.task_temp = os.path.expanduser(dir_temp + filename + '_current')
+		self.stderr = os.path.expanduser(dir_temp + filename + '_stderr')
+		self.result_dump = os.path.expanduser(dir_temp+ filename + '_resultdump')
 		self.output = os.path.expanduser(task_file + '_output')
-		self.regclasses = os.path.expanduser('~/.PyBounds/registered_classes')
+		self.regclasses = os.path.expanduser(dir_temp + '/registered_classes')
 		Files.regclasses = self.regclasses
 	pass
 
@@ -33,10 +34,10 @@ pass
 def dump(obj, filename):
 	try:
 		f = open(filename, 'wb')
-		pickle.Pickler(f).dump(obj)
+		pickle.dump(obj, f, protocol=0)
 		f.close()
 	except Exception as ex:
-		#print "trouble while dumping: " + str(ex.__class__.__name__) + " " + str(ex)
+		print("trouble while dumping: " + str(ex.__class__.__name__) + " " + str(ex))
 		raise
 pass
 
@@ -44,10 +45,10 @@ pass
 def load(filename):
 	try:
 		f = open(filename, 'rb')
-		obj = pickle.Unpickler(f).load()
+		obj = pickle.load(f)
 		f.close()
 		return obj
 	except Exception as ex:
-		#print "trouble while loading: " + str(ex.__class__.__name__) + " " + str(ex)
+		print("trouble while loading: " + str(ex.__class__.__name__) + " " + str(ex))
 		raise
 pass

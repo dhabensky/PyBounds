@@ -8,7 +8,7 @@ class TestArg:
 		self.used = False
 	pass
 
-	def next(self):
+	def __next__(self):
 		if not self.used:
 			self.used = True
 			return self.raw_string

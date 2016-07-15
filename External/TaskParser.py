@@ -19,6 +19,7 @@ class TaskParser:
 		self.registered_classes = {}
 		self.asterisk_import = []
 		self.register_by_query("BuiltInArgs *", silent=True)
+		self.dir_name = None
 		self.task_file = None
 		self.__lines__ = None
 	pass
@@ -44,10 +45,10 @@ class TaskParser:
 
 			try:
 				task_list.append(self.__parse_line__(line))
-			except Exception, ex:
+			except Exception as ex:
 				if not silent:
-					print "Error parsing task:\n" + line
-					print ex
+					print("Error parsing task:\n" + line)
+					print(ex)
 			pass
 		pass
 
@@ -94,7 +95,7 @@ class TaskParser:
 
 		args = eval("[" + s + "]")
 
-		for i in xrange(len(args)):
+		for i in range(len(args)):
 			if isinstance(args[i], str) or isinstance(args[i], int) or isinstance(args[i], float):
 				args[i] = SimpleArg(args[i])
 			elif isinstance(args[i], list) or isinstance(args[i], tuple):
@@ -158,9 +159,9 @@ class TaskParser:
 			# if not silent:
 			# 	print "done"
 
-		except Exception, ex:
+		except Exception as ex:
 			if not silent:
-				print 'error loading argument classes: ' + str(ex)
+				print('error loading argument classes: ' + str(ex))
 	pass
 
 	def save_registered_classes(self, filename):
@@ -200,17 +201,17 @@ class TaskParser:
 					try:
 						self.__register_arg_class__(cls, clss.module)
 						if not silent:
-							print "    + " + cls.__name__
-					except Exception, ex:
+							print("    + " + cls.__name__)
+					except Exception as ex:
 						if not silent:
-							print "    - " + str(ex)
+							print("    - " + str(ex))
 					pass
 				pass
 			pass
 
-		except Exception, ex:
+		except Exception as ex:
 			if not silent:
-				print "    - error: " + str(ex)
+				print("    - error: " + str(ex))
 	pass
 
 	def unregister_by_query(self, query, silent=False):
@@ -228,9 +229,9 @@ class TaskParser:
 		for word in words:
 			try:
 				self.__unregister_arg_class__(word)
-			except Exception, ex:
+			except Exception as ex:
 				if not silent:
-					print "    - " + str(ex)
+					print("    - " + str(ex))
 	pass
 
 pass

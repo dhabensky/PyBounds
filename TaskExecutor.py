@@ -13,9 +13,8 @@ from External.Escape import *
 from Shared.ExecutionResult import ExecutionResult
 from Shared.Files import *
 
-
 realpath = str(dirname(realpath(__file__)))
-files = Files('')
+#files = Files('')
 
 
 class TaskExecutor:
@@ -25,7 +24,9 @@ class TaskExecutor:
 		self.memory_limit = 1000000    # Kb
 		self.task_temp_file = None
 		self.task_parser = None
+		# self.compression = None
 	pass
+
 
 	def run(self, verbose=False, silent=False):
 
@@ -40,21 +41,18 @@ class TaskExecutor:
 
 			try:
 				for current_args in task:
-
 					if current_args[0].startswith("."):
 						current_args[0] = os.path.abspath(current_args[0])
 					progname = os.path.split(current_args[0])[1]
 
-					current_args = " ".join(map(shell_escape, current_args))
+					current_args = "\t".join(map(shell_escape, current_args))
+					# print(current_args)
 
 					if verbose:
-						print current_args
-
-					# f = open(self.task_temp_file, 'w')
-					# f.write(current_args)
-					# f.close()
+						print(current_args)
 
 					result = self.exec_and_get_result(progname, current_args)
+
 
 					if oldresult is None or not result.equal(oldresult):
 						result.args_start_bound = current_args
@@ -68,11 +66,11 @@ class TaskExecutor:
 
 					oldresult = result
 				pass
-			except Exception, ex:
+			except Exception as ex:
 				if not silent:
-					print "Error during task " + progname
-					print str(type(ex)) + " " + str(ex)
-					print "Task not completed"
+					print("Error during task " + progname)
+					print(str(type(ex)) + " " + str(ex))
+					print("Task not completed")
 			pass
 
 		pass
@@ -106,8 +104,8 @@ class TaskExecutor:
 		try:
 			timeout = self.exec_gdb_timeout(progname, args)
 
-		except Exception, ex:
-			print str(ex.__class__.__name__) + " in exec_gdb(): " + str(ex)
+		except Exception as ex:
+			print(str(ex.__class__.__name__) + " in exec_gdb(): " + str(ex))
 			raise
 		pass
 
@@ -144,37 +142,42 @@ class TaskExecutor:
 
 	def exec_gdb_timeout(self, progname, args):
 		try:
+
 			echoarg = "python "\
 					+ "path=\"" + str(realpath) + "\";"\
+					+ "dir_name=\"" + self.task_parser.dir_name + "\";"\
 					+ "taskfile=\"" + self.task_parser.task_file + "\";"\
 					+ "task=r\"" + args.replace('"', '\\"') + "\";"\
 					+ "exec(open(\"" + str(realpath) + "/GdbInternal/Executor.py\").read())"
 			# print echoarg
 			# input()
+			# print()
 			pipe = " | "
 			gdbstart = "perl -w " + str(realpath) + "/timeout" + " -t " + str(self.time_limit) + " -m " + str(self.memory_limit)\
 					+ " gdb --silent 2>" + shell_escape(files.stderr) + " 1>/dev/null"
 
 			cmd = "echo " + shell_escape(echoarg) + pipe + gdbstart
-			#print "cmd:", cmd
+			# print("cmd :", cmd)
+			# print()
 			return RunCmdTimeout(cmd, progname, self.time_limit).run()
-		except Exception, ex:
-			print ex
+		except Exception as ex:
+			print("exec_gdb_timeout " + str(ex))
 			return False
 	pass
 
 pass
 
 
-def main(task_file, time, memory, verbose, silent):
+def main(dir_name, task_file, time, memory, verbose, silent):
 	global files
-	files = Files(task_file)
+	# print(realpath)
+	files = Files(dir_name, task_file)
 
-	if not os.path.exists(os.path.expanduser("~/.PyBounds")):
-		os.mkdir(os.path.expanduser("~/.PyBounds"))
+	# if not os.path.exists(os.path.expanduser("~/.PyBounds")):
+	# 	os.mkdir(os.path.expanduser("~/.PyBounds"))
 
 	try:
-		files = Files(task_file)
+		files = Files(dir_name, task_file)
 
 		if not os.path.exists(files.regclasses):
 			try:
@@ -183,23 +186,31 @@ def main(task_file, time, memory, verbose, silent):
 				pass
 
 		parser = TaskParser()
+		executor = TaskExecutor()
+
+		# executor.compression = CompressionParameters()
+		# executor.compression.main(files.task)
+
+		parser.dir_name = dir_name
 		parser.set_task_file(files.task)
 		parser.load_registered_classes(files.regclasses)
 
-		executor = TaskExecutor()
+		# executor.compression.return_file_back(files.task)
+
 		executor.task_parser = parser
 		executor.task_temp_file = files.task_temp
 		executor.time_limit = time
 		executor.memory_limit = memory
 		executor.run(verbose, silent)
 
+
 		rm_file(files.result_dump)
 		rm_file(files.task_temp)
 		#os.system("cat " + shell_escape(files.stderr))
 		rm_file(files.stderr)
 
-	except Exception, ex:
-		print str(ex)
+	except Exception as ex:
+		print("TaskExecutor.main error" + str(ex))
 
-	print "PyBounds: tasks completed"
+	print("PyBounds: tasks completed")
 pass
