@@ -155,7 +155,7 @@ def main():
 
 	if len(args) > 0:
 		TaskExecutor.main(dir_temp, args[0], time, memory, verbose, silent)
-		#rmtree(dir_temp)
+		rmtree(dir_temp)
 	else:
 		print("    required task_file")
 		usage()

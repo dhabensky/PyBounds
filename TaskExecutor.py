@@ -25,7 +25,6 @@ class TaskExecutor:
 		self.task_temp_file = None
 		self.task_parser = None
 		# self.compression = None
-	pass
 
 
 	def run(self, verbose=False, silent=False):
@@ -46,7 +45,7 @@ class TaskExecutor:
 					progname = os.path.split(current_args[0])[1]
 
 					current_args = "\t".join(map(shell_escape, current_args))
-					# print(current_args)
+					#print(current_args)
 
 					if verbose:
 						print(current_args)
@@ -65,19 +64,12 @@ class TaskExecutor:
 						cases[len(cases) - 1].args_end_list = task.get_args_str()
 
 					oldresult = result
-				pass
 			except Exception as ex:
 				if not silent:
 					print("Error during task " + progname)
 					print(str(type(ex)) + " " + str(ex))
 					print("Task not completed")
-			pass
-
-		pass
-
 		dump(task_result, files.output)
-		pass
-	pass
 
 	def res_from_dump(self):
 		try:
@@ -86,7 +78,6 @@ class TaskExecutor:
 			return result
 		except:
 			return ExecutionResult()
-	pass
 
 	def res_from_stderr(self):
 		try:
@@ -95,7 +86,6 @@ class TaskExecutor:
 			return result
 		except:
 			return ExecutionResult()
-	pass
 
 	def exec_and_get_result(self, progname, args):
 
@@ -107,7 +97,6 @@ class TaskExecutor:
 		except Exception as ex:
 			print(str(ex.__class__.__name__) + " in exec_gdb(): " + str(ex))
 			raise
-		pass
 
 		dumpres = self.res_from_dump()
 		stderrres = self.res_from_stderr()
@@ -138,20 +127,24 @@ class TaskExecutor:
 			return stderrres
 
 		return stderrres
-	pass
 
 	def exec_gdb_timeout(self, progname, args):
 		try:
+
+			# + "task=r\"" + args.replace('"', '\\"') + "\";"\
 
 			echoarg = "python "\
 					+ "path=\"" + str(realpath) + "\";"\
 					+ "dir_name=\"" + self.task_parser.dir_name + "\";"\
 					+ "taskfile=\"" + self.task_parser.task_file + "\";"\
-					+ "task=r\"" + args.replace('"', '\\"') + "\";"\
 					+ "exec(open(\"" + str(realpath) + "/GdbInternal/Executor.py\").read())"
 			# print echoarg
 			# input()
 			# print()
+			task_to_gdb = open((self.task_parser.dir_name + "/task_to_gdb"), 'w')
+			task_to_gdb.write(args)
+			task_to_gdb.close()
+
 			pipe = " | "
 			gdbstart = "perl -w " + str(realpath) + "/timeout" + " -t " + str(self.time_limit) + " -m " + str(self.memory_limit)\
 					+ " gdb --silent 2>" + shell_escape(files.stderr) + " 1>/dev/null"
@@ -159,13 +152,12 @@ class TaskExecutor:
 			cmd = "echo " + shell_escape(echoarg) + pipe + gdbstart
 			# print("cmd :", cmd)
 			# print()
+
 			return RunCmdTimeout(cmd, progname, self.time_limit).run()
 		except Exception as ex:
 			print("exec_gdb_timeout " + str(ex))
 			return False
-	pass
 
-pass
 
 
 def main(dir_name, task_file, time, memory, verbose, silent):
@@ -213,4 +205,3 @@ def main(dir_name, task_file, time, memory, verbose, silent):
 		print("TaskExecutor.main error" + str(ex))
 
 	print("PyBounds: tasks completed")
-pass
