@@ -5,6 +5,26 @@ import threading
 import subprocess
 
 
+
+
+def debug_print(s, name_log):
+	directory = "/home/max/TestFile/"
+	directory += name_log
+	format_file = ".txt"
+	directory += format_file
+
+	ffff = open(directory, 'a')
+	ffff.write(s)
+	ffff.write('\n')
+	ffff.close()
+
+def check_num(s):
+	s_res = ''	
+	for i in s:
+		if(i >= '0' and i <= '9' or i == ' '):
+			s_res += i	
+	return s_res
+
 class RunCmd(threading.Thread):
 
 	def __init__(self, cmd, progname):
@@ -18,7 +38,7 @@ class RunCmd(threading.Thread):
 	pass
 
 	def run(self):
-		#print self.cmd
+		# print(self.cmd)
 		os.system(self.cmd)
 	pass
 
@@ -36,10 +56,14 @@ class RunCmd(threading.Thread):
 				except:
 					pass
 
-			if len(pids) != 0:
-				os.system("kill -15 " + " ".join(pids) + " 2>/dev/null")
-		except:
-			pass
+			# print(pids)
+			if len(pids) != 0:	
+				pids_str = ' '.join(str(i) for i in pids)
+				pids_str = check_num(pids_str)
+				# print(pids_str)			
+				os.system("kill -9 " + pids_str + " 2>/dev/null")
+		except Exception as ex:			
+			print(str(ex))
 		pass
 	pass
 
@@ -60,14 +84,11 @@ class RunCmdTimeout:
 
 		while self.runcmd.is_alive() and datetime.datetime.now() - start < delta:
 			time.sleep(0.1)
-		pass
 
 		if self.runcmd.is_alive():
 			self.runcmd.stop()
 			return True
 		else:
 			return False
-		pass
-	pass
 
 pass  # RunCmdTimeout

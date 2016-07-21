@@ -1,35 +1,37 @@
-#!/usr/bin/python2.7
+#!/usr/bin/python3.5
 
 __author__ = 'admin'
 
 import getopt
 import sys
 import TaskExecutor
+from shutil import rmtree
+from tempfile import mkdtemp
 from External.TaskParser import TaskParser
 from Shared.Files import *
 
 
 def usage():
-	print
-	print "USAGE:"
-	print
-	print "  -h | --help                          - prints this message"
-	print
-	print " [-v | -s] [-t secs] [-m kilobytes] task_file"
-	print "                                       - run task from 'task_file'"
-	print "                                          in normal, (v)erbose or (s)ilent mode"
-	print "                                          with optional time and/or memory limit"
-	print
-	print "  -r | --reg module cls1 [ cls2 [...]] - register argument classes 'cls1'"
-	print "                                          'cls2', ... from module 'module'"
-	print
-	print "  -u | --unreg cls1 [ cls2 [...] ]     - unregister argument classes 'cls1'"
-	print "                                          'cls2', ... "
-	print
-	print "  -p | --print                         - show registered classes"
-	print
-	print "  -c | --clear                         - clear registered classes"
-	print
+	print()
+	print("USAGE:")
+	print()
+	print("  -h | --help                          - prints this message")
+	print()
+	print(" [-v | -s] [-t secs] [-m kilobytes] task_file")
+	print("                                       - run task from 'task_file'")
+	print("                                          in normal, (v)erbose or (s)ilent mode")
+	print("                                          with optional time and/or memory limit")
+	print()
+	print("  -r | --reg module cls1 [ cls2 [...]] - register argument classes 'cls1'")
+	print("                                          'cls2', ... from module 'module'")
+	print()
+	print("  -u | --unreg cls1 [ cls2 [...] ]     - unregister argument classes 'cls1'")
+	print("                                          'cls2', ... ")
+	print()
+	print("  -p | --print                         - show registered classes")
+	print()
+	print("  -c | --clear                         - clear registered classes")
+	print()
 pass
 
 verbose = False
@@ -43,14 +45,17 @@ def main():
 	try:
 		opts, args = getopt.getopt(sys.argv[1:], "vst:m:h:r:upc", ["help", "register=", "unregister", "print", "clear"])
 	except getopt.GetoptError as err:
-		print "    " + str(err)
+		print("    " + str(err))
 		usage()
 		sys.exit(2)
 	pass
 
-	if not os.path.exists(os.path.expanduser("~/.PyBounds")):
-		os.mkdir(os.path.expanduser("~/.PyBounds"))
-	files = Files('')
+	# if not os.path.exists(os.path.expanduser("~/.PyBounds")):
+	# 	os.mkdir(os.path.expanduser("~/.PyBounds"))
+
+	dir_temp= mkdtemp()
+
+	files = Files(dir_temp, '')
 	if not os.path.exists(files.regclasses):
 		try:
 			open(files.regclasses, 'w').close()
@@ -72,14 +77,14 @@ def main():
 
 		elif o == "-v":
 			if silent:
-				print "    silent and verbose are exclusive options"
+				print("    silent and verbose are exclusive options")
 				usage()
 				sys.exit(1)
 			verbose = True
 
 		elif o == "-s":
 			if verbose:
-				print "    silent and verbose are exclusive options"
+				print("    silent and verbose are exclusive options")
 				usage()
 				sys.exit(1)
 			silent = True
@@ -88,33 +93,33 @@ def main():
 			try:
 				time = float(a)
 			except:
-				print "    time must be a number"
+				print("    time must be a number")
 				usage()
 				exit(1)
 
 			if time < 0:
-				print "    time must be positive"
+				print("    time must be positive")
 				usage()
 				exit(1)
 
 			if time < 1.5:
-				print "    recommended time limit: > 1.5 seconds"
+				print("    recommended time limit: > 1.5 seconds")
 
 		elif o == "-m":
 			try:
 				memory = int(a)
 			except:
-				print "    memory must be a number"
+				print("    memory must be a number")
 				usage()
 				exit(1)
 
 			if memory < 0:
-				print "    memory must be positive"
+				print("    memory must be positive")
 				usage()
 				exit(1)
 
 			if memory < 100000:
-				print "    recommended memory limit: > 100000 Kb"
+				print("    recommended memory limit: > 100000 Kb")
 
 		elif o in ("-r", "--register"):
 			module = a
@@ -149,9 +154,10 @@ def main():
 	pass
 
 	if len(args) > 0:
-		TaskExecutor.main(args[0], time, memory, verbose, silent)
+		TaskExecutor.main(dir_temp, args[0], time, memory, verbose, silent)
+		rmtree(dir_temp)
 	else:
-		print "    required task_file"
+		print("    required task_file")
 		usage()
 		exit(1)
 
